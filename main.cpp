@@ -365,12 +365,23 @@ pop(stackHead,stackHead);
 
 
 void buildTree(node* &queueHead,node* &treeHead,node* currentQueue,node* currentTree) {
-    while(!isEmpty(queueHead)) {
+    
+    while(currentQueue!= NULL) {
+        cout << currentQueue ->getValue();
+        currentQueue = currentQueue->getNext();
+        
+    }
+    cout << endl;
+    while(queueHead!=NULL) {
+        cout << queueHead->getValue() << endl;
         
         if(isdigit(*(queueHead->getValue()))) {
+          
             node* temp = new node(queueHead->getValue());
             push(treeHead,treeHead,temp);
+            
             dequeue(queueHead,queueHead);
+           
             
             
             
@@ -381,7 +392,9 @@ void buildTree(node* &queueHead,node* &treeHead,node* currentQueue,node* current
             temp->setLeft(peek(treeHead,treeHead));
             pop(treeHead,treeHead);
             push(treeHead,treeHead,temp);
+          
             dequeue(queueHead,queueHead);
+        
             
             
             
@@ -390,6 +403,7 @@ void buildTree(node* &queueHead,node* &treeHead,node* currentQueue,node* current
         
         
     }
+    cout << endl;
     
 }
 
@@ -433,7 +447,7 @@ void prefix(node* treeHead) {
 
 
 void postfix(node* treeHead) {
-    if(treeHead != NULL) {
+ 
     if(treeHead->getLeft() != NULL) {
         postfix(treeHead->getLeft());
         
@@ -443,7 +457,7 @@ void postfix(node* treeHead) {
     }
     cout << treeHead->getValue();
         
-    }
+    
     
     
 }
@@ -467,7 +481,26 @@ int main() {
     cin.get();
     shunt(input,stackHead,queueHead, stackHead,queueHead);
     buildTree(queueHead,treeHead,queueHead,treeHead);
-    cout << "If you would like to output in postfix type: 'post'. IF you would like to ouput in prefix type 'pre'. If you would like to output in infix type 'in'"
+    cout << "If you would like to output in postfix type: 'post'. IF you would like to ouput in prefix type: 'pre'. If you would like to output in infix type: 'in'." << endl;
+    char inp[50];
+    cin.get(inp,50);
+    cin.get();
+    if(strcmp(inp,"post") == 0) {
+        postfix(treeHead);
+        
+    }
+    else if(strcmp(inp,"pre") == 0) {
+        prefix(treeHead);
+        
+    }
+    
+    else if(strcmp(inp,"in") == 0) {
+        infix(treeHead);
+        
+    }
+    else {
+        cout << "Enter a valid option!" << endl;
+    }
     
     
     return 0;
