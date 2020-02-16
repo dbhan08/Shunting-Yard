@@ -118,7 +118,7 @@ node*  pop(node* &head,node*current) {
     
 }
 
-node* peek(node* &head, node * current, node* &tail) {
+node* peek(node* &head, node * current) {
     
     if(head == NULL) {
         return NULL;
@@ -183,7 +183,7 @@ int prec(char first) {
 }
 
 
-void shunt(char array[80], node* &stackHead, node* &queueHead, node* &stackTail, node* &queueTail, node* stack, node* queue) {
+void shunt(char array[80], node* &stackHead, node* &queueHead, node* stack, node* queue) {
 int i = 0;
 for(i= 0; array[i] != '\0'; i++) {
 if(isdigit(array[i]) == true) {
@@ -208,12 +208,12 @@ enqueue(queueHead,queueHead ,temp);
         
         
        
-    while((prec(*(peek(stackHead,stackHead,stackTail)->getValue())) > prec(array[i]) || (prec(*(peek(stackHead,stackHead,stackTail)->getValue())) == prec(array[i]) && associative(array[i]))) &&
-          *(peek(stackHead,stackHead,stackTail)->getValue()) != '(' ) {
+    while((prec(*(peek(stackHead,stackHead)->getValue())) > prec(array[i]) || (prec(*(peek(stackHead,stackHead)->getValue())) == prec(array[i]) && associative(array[i]))) &&
+          *(peek(stackHead,stackHead)->getValue()) != '(' ) {
        
        
       
-         enqueue(queueHead,queueHead,peek(stackHead,stackHead,stackTail));
+         enqueue(queueHead,queueHead,peek(stackHead,stackHead));
         pop(stackHead,stackHead);
         
      
@@ -291,13 +291,13 @@ push(stackHead,stackHead ,temp);
     
     
    
-while(*(peek(stackHead,stackHead,stackTail) -> getValue()) != '(') {
+while(*(peek(stackHead,stackHead) -> getValue()) != '(') {
     
  
     
     
  
- enqueue(queueHead,queueHead,peek(stackHead,stackHead,stackTail));
+ enqueue(queueHead,queueHead,peek(stackHead,stackHead));
     
 pop(stackHead,stackHead);
     
@@ -308,7 +308,7 @@ pop(stackHead,stackHead);
    
     
     
-if(*(peek(stackHead,stackHead,stackTail)->getValue()) == '(') {
+if(*(peek(stackHead,stackHead)->getValue()) == '(') {
     
    
 
@@ -334,7 +334,7 @@ pop(stackHead,stackHead);
             
             
            
-            enqueue(queueHead,queueHead, peek(stackHead,stackHead,stackTail));
+            enqueue(queueHead,queueHead, peek(stackHead,stackHead));
             pop(stackHead,stackHead);
             
             
@@ -348,17 +348,104 @@ pop(stackHead,stackHead);
     
   
 
-
+/*
     while(queueHead != NULL) {
         cout << queueHead->getValue();
         queueHead = queueHead->getNext();
         
     }
     cout << endl;
-
+*/
     return;
 
 
+}
+
+
+
+
+void buildTree(node* &queueHead,node* &treeHead,node* currentQueue,node* currentTree) {
+    while(!isEmpty(queueHead)) {
+        
+        if(isdigit(*(queueHead->getValue()))) {
+            node* temp = new node(queueHead->getValue());
+            push(treeHead,treeHead,temp);
+            dequeue(queueHead,queueHead);
+            
+            
+            
+        } else {
+            node* temp = new node(queueHead->getValue());
+            temp->setRight(peek(treeHead,treeHead));
+            pop(treeHead,treeHead);
+            temp->setLeft(peek(treeHead,treeHead));
+            pop(treeHead,treeHead);
+            push(treeHead,treeHead,temp);
+            dequeue(queueHead,queueHead);
+            
+            
+            
+            
+        }
+        
+        
+    }
+    
+}
+
+
+void infix(node * treeHead) {
+    if(treeHead != NULL) {
+    if(*(treeHead->getValue()) == '+' || *(treeHead->getValue()) == '-' || *(treeHead->getValue()) == '*' || *(treeHead->getValue()) == '/') {
+        cout << "(";
+    }
+    if(treeHead->getLeft() != NULL) {
+        infix(treeHead->getLeft());
+    }
+    cout << treeHead->getValue();
+    if(treeHead->getRight() != NULL) {
+        infix(treeHead->getRight());
+    }
+ 
+    
+    if(*(treeHead->getValue()) == '+' || *(treeHead->getValue()) == '-' || *(treeHead->getValue()) == '*' || *(treeHead->getValue()) == '/') {
+        cout << ")";
+    }
+    }
+    
+}
+
+
+void prefix(node* treeHead) {
+    if(treeHead != NULL) {
+    cout << treeHead->getValue();
+        if(treeHead -> getLeft() != NULL) {
+            prefix(treeHead->getLeft());
+        }
+        if(treeHead->getRight() != NULL) {
+            prefix(treeHead->getRight());
+            
+        }
+    
+    }
+    
+}
+
+
+void postfix(node* treeHead) {
+    if(treeHead != NULL) {
+    if(treeHead->getLeft() != NULL) {
+        postfix(treeHead->getLeft());
+        
+    }
+    if(treeHead->getRight() != NULL) {
+        postfix(treeHead->getRight());
+    }
+    cout << treeHead->getValue();
+        
+    }
+    
+    
 }
 
 
@@ -366,19 +453,21 @@ int main() {
     
     node* stackHead = new node(NULL);
     node* queueHead = new node(NULL);
-    node* stackTail = new node(NULL);
-    node* queueTail = new node(NULL);
+
+    node* treeHead = new node(NULL);
+    treeHead = NULL;
     stackHead = NULL;
     queueHead = NULL;
-    stackTail = NULL;
-    queueTail = NULL;
+
     
     
     cout << "Enter a mathematical expression in infix notation." << endl;
     char input[80];
     cin.get(input, 80);
     cin.get();
-    shunt(input,stackHead,queueHead,stackTail,queueTail, stackHead,queueHead);
+    shunt(input,stackHead,queueHead, stackHead,queueHead);
+    buildTree(queueHead,treeHead,queueHead,treeHead);
+    cout << "If you would like to output in postfix type: 'post'. IF you would like to ouput in prefix type 'pre'. If you would like to output in infix type 'in'"
     
     
     return 0;
