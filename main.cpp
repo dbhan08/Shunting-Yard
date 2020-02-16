@@ -42,6 +42,7 @@ insert->setNext(NULL);
 }
 
 node* dequeue(node* &head, node* current) {
+    int count = 0;
 if(head == NULL) {
 return NULL;
 
@@ -70,8 +71,10 @@ head = insert;
 if(current->getNext() != NULL) {
 push(head,current->getNext(), insert);
 } else {
-current->setNext(insert);
-insert->setNext(NULL);
+    node* temp = new node(insert->getValue());
+current->setNext(temp);
+temp->setNext(NULL);
+
 
 }
 
@@ -80,61 +83,64 @@ insert->setNext(NULL);
 }
 
 node*  pop(node* &head,node*current) {
-if(head == NULL) {
-return NULL; 
-} else if(current->getNext() == NULL) {
-    head = NULL;
-    return NULL;
+    
+    
+    
+    if(head == NULL) {
+        return NULL;
+    }
+    
+    
+     else if(current ->getNext() != NULL) {
+      
         
+         while(current->getNext()->getNext() != NULL) {
+             current = current->getNext();
+            
+         }
         
-} else {
-if(current->getNext()->getNext() != NULL) {
-pop(head, current->getNext());
-
-} else {
-
-current->getNext()->setNext(NULL);
-return current->getNext();
-}
-
-}
-return NULL;
-}
-
-node* peek(node* head) {
-if(head->getNext() != NULL) {
-peek(head->getNext());
-} else {
-return head->getNext();
-
-}
-
-return NULL;
-}
-
-
-node* getTail(node* head) {
-  
+         node* temp = new node(NULL);
+         temp = NULL;
+         current->setNext(temp);
    
-    if(head->getNext() != NULL) {
+         
+
+         
+         return current;
+        
+     } else if(current->getNext() == NULL) {
      
-        cout << "1" << endl;
+      
+         head = NULL;
+     }
+    
+       return current;
+    
+}
+
+node* peek(node* &head, node * current, node* &tail) {
+    
+    if(head == NULL) {
+        return NULL;
+    }
+    while(current->getNext() != NULL) {
         
-        getTail(head->getNext());
-        
-    } else {
-       
-        cout << "2" << endl;
-        
-        
-        return head;
+  
+        current = current->getNext();
         
     }
     
-  
-    return NULL;
     
+
+    return current;
+
 }
+   
+
+
+
+
+
 
 
 
@@ -164,7 +170,7 @@ int prec(char first) {
         return 3;
         
         
-    } else if(first == '*'|| '/') {
+    } else if(first == '*'||first == '/') {
         return 2;
         
     } else {
@@ -177,48 +183,82 @@ int prec(char first) {
 }
 
 
-void shunt(char array[80], node* &stackHead, node* &queueHead) {
+void shunt(char array[80], node* &stackHead, node* &queueHead, node* &stackTail, node* &queueTail, node* stack, node* queue) {
 int i = 0;
 for(i= 0; array[i] != '\0'; i++) {
 if(isdigit(array[i]) == true) {
  
-    cout << "a" << endl;
+    
     char* data = new char(array[i]);
 node* temp = new node(data);
 
 enqueue(queueHead,queueHead ,temp);
     
+  
     
-   
- 
+    
+
 
 
 
 } else if(array[i] == '+' || array[i] =='-' ||array[i] == '^' ||array[i] == '/' || array[i] == '*') {
     
-    cout << "b" << endl;
+
     if(!isEmpty(stackHead)) {
-    while((prec(*(stackHead->getValue())) > prec(array[i]) || (prec(*(stackHead->getValue())) == prec(array[i]) && associative(array[i]))) && *(stackHead->getValue()) != '(' && (!isEmpty(stackHead))) {
-        cout << "c" << endl;
+        
+        
+       
+    while((prec(*(peek(stackHead,stackHead,stackTail)->getValue())) > prec(array[i]) || (prec(*(peek(stackHead,stackHead,stackTail)->getValue())) == prec(array[i]) && associative(array[i]))) &&
+          *(peek(stackHead,stackHead,stackTail)->getValue()) != '(' ) {
+       
+       
       
-         enqueue(queueHead,queueHead,stackHead);
+         enqueue(queueHead,queueHead,peek(stackHead,stackHead,stackTail));
         pop(stackHead,stackHead);
-        cout << "d" << endl;
+        
+     
+        if(isEmpty(stackHead)) {
+            
+            break;
+        }
        
       
         
     }
         
+        
+      
+ 
+       
+       
+        char* data = new char(array[i]);
+        node* temp = new node(data);
+  
+        
+        push(stackHead,stackHead,temp);
+        
+      
+      
+      
+        
     
-    }
+    } else {
     
-        cout << "l" << endl;
+      
     char* data = new char(array[i]);
     node* temp = new  node(data);
-    cout << "y" << endl;
+    
  
     push(stackHead,stackHead, temp);
+      
     
+        
+        
+        
+     
+        
+        
+    }
     
 } else if(array[i] == '(' ) {
   
@@ -226,11 +266,15 @@ char* data = new char(array[i]);
 
 node* temp = new node(data);
 push(stackHead,stackHead ,temp);
-    cout << "e" << endl;
+  
+ 
+    
+
+
     
   
+ 
     
-   
     
    
  
@@ -238,52 +282,80 @@ push(stackHead,stackHead ,temp);
 
 } else if(array[i] == ')') {
     
-    cout << "f" << endl;
-   
-while(*(getTail(stackHead) -> getValue()) != '(') {
+    
   
+
+    
+    
+    
+    
+    
+   
+while(*(peek(stackHead,stackHead,stackTail) -> getValue()) != '(') {
+    
+ 
+    
+    
+ 
+ enqueue(queueHead,queueHead,peek(stackHead,stackHead,stackTail));
+    
 pop(stackHead,stackHead);
-enqueue(queueHead,queueHead,stackHead);
-
-    cout << "h" << endl;
-
-}
     
-    cout << "q" << endl;
-if(*(getTail(stackHead)->getValue()) == '(') {
-    cout << "i" << endl;
+}
+   
+
+    
+   
+    
+    
+if(*(peek(stackHead,stackHead,stackTail)->getValue()) == '(') {
+    
+   
+
 pop(stackHead,stackHead);
+
     
-    cout << "j" << endl;
+ 
 
 }
-  cout << "g" << endl;
+
 }
 
 }
     
 
-        
+    
+  
+    
+    
+
+
         while(stackHead != NULL) {
-            cout << "z" << endl;
-            enqueue(queueHead,queueHead,stackHead);
+            
+            
+           
+            enqueue(queueHead,queueHead, peek(stackHead,stackHead,stackTail));
             pop(stackHead,stackHead);
             
             
+         
+           
+    
         }
-        
+    
     
     
     
   
 
-    
-    while(queueHead!= NULL) {
+
+    while(queueHead != NULL) {
         cout << queueHead->getValue();
         queueHead = queueHead->getNext();
         
     }
     cout << endl;
+
     return;
 
 
@@ -294,15 +366,19 @@ int main() {
     
     node* stackHead = new node(NULL);
     node* queueHead = new node(NULL);
+    node* stackTail = new node(NULL);
+    node* queueTail = new node(NULL);
     stackHead = NULL;
     queueHead = NULL;
+    stackTail = NULL;
+    queueTail = NULL;
     
     
     cout << "Enter a mathematical expression in infix notation." << endl;
     char input[80];
     cin.get(input, 80);
     cin.get();
-    shunt(input,stackHead,queueHead);
+    shunt(input,stackHead,queueHead,stackTail,queueTail, stackHead,queueHead);
     
     
     return 0;
