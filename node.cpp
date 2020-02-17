@@ -1,8 +1,16 @@
+/*
+ Following is the node.cpp file for the node class. Defines the functions that will be essential for the program
+ By:Deyvik Bhan
+ date: 2/04/20
+ 
+ 
+ */
+
 #include <iostream>
 #include <cstring>
 #include "node.h"
 
-
+// Constrcuctor
 node::node(char* newData) {
 value = newData;
 next = NULL;
@@ -11,7 +19,7 @@ right = NULL;
 
 }
 
-
+// All of the other functions either set the next,left or right pointer
 void node::setNext(node* newNext) {
 next = newNext;
 

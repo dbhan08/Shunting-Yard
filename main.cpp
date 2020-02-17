@@ -1,9 +1,23 @@
+/*
+ The following program is a shunting yard algorithim which can convert infix to postfix, then creates an expression tree and is able to convert that to infix postfix or prefix
+ By:Deyvik Bhan
+ Date:2/5/20
+ 
+ 
+ 
+ */
+
+
+
 #include <iostream>
 #include <cstring>
 #include "node.h"
 
 
 using namespace std;
+
+
+// Following function checks if stack or queue is empty
 
 bool isEmpty(node* head) {
     
@@ -16,7 +30,7 @@ bool isEmpty(node* head) {
     
 }
 
-
+// Following function adds node to queue(adds node to the end of the linked list)
 void enqueue(node* &head,node* current, node* insert) {
     
 if(head == NULL) {
@@ -41,6 +55,8 @@ insert->setNext(NULL);
 }
 }
 
+
+// Following function removes the first object from the queue(removes head of linked list)
 node* dequeue(node* &head, node* current) {
     int count = 0;
 if(head == NULL) {
@@ -62,7 +78,7 @@ return current;
 
 }
 
-
+// Follwing function adds node to the end of the stack(adds node to the end of the linked list)
 void push(node* &head,node* current, node* insert) {
 if(head == NULL) {
 head = insert;
@@ -82,6 +98,8 @@ temp->setNext(NULL);
 
 }
 
+
+//Following function removes node from the top of the stack(removes from end of the linked list(aka removes tail))
 node*  pop(node* &head,node*current) {
     
     
@@ -118,6 +136,8 @@ node*  pop(node* &head,node*current) {
     
 }
 
+
+// Following function returns the top of the stack(returns the tail)
 node* peek(node* &head, node * current) {
     
     if(head == NULL) {
@@ -143,7 +163,7 @@ node* peek(node* &head, node * current) {
 
 
 
-
+// Following function checks if token is associative
 bool associative(char c) {
     if(c == '^') {
         
@@ -162,7 +182,7 @@ bool associative(char c) {
 
 
 
-
+// Following function returns the precedence of an operator(for order of operations)
 int prec(char first) {
     
 
@@ -183,14 +203,20 @@ int prec(char first) {
 }
 
 
+//Pseudocode gotten from https://en.wikipedia.org/wiki/Shunting-yard_algorithm
+
 void shunt(char array[80], node* &stackHead, node* &queueHead, node* stack, node* queue) {
 int i = 0;
+    // While there is a token to read
 for(i= 0; array[i] != '\0'; i++) {
+    // If token is a digit
 if(isdigit(array[i]) == true) {
  
     
     char* data = new char(array[i]);
 node* temp = new node(data);
+    
+    // Add to output queue
 
 enqueue(queueHead,queueHead ,temp);
     
@@ -199,20 +225,20 @@ enqueue(queueHead,queueHead ,temp);
     
 
 
-
+// If token is an operator
 
 } else if(array[i] == '+' || array[i] =='-' ||array[i] == '^' ||array[i] == '/' || array[i] == '*') {
     
-
+// If stack is empty
     if(!isEmpty(stackHead)) {
         
         
-       
+     // While there is an operator on the top of the stack with greater precedence then the token or they have same precedence and the token is left associative and the top of the stack is not a left paren
     while((prec(*(peek(stackHead,stackHead)->getValue())) > prec(array[i]) || (prec(*(peek(stackHead,stackHead)->getValue())) == prec(array[i]) && associative(array[i]))) &&
           *(peek(stackHead,stackHead)->getValue()) != '(' ) {
        
        
-      
+      // Add top of stack to output queue and remove from the stack
          enqueue(queueHead,queueHead,peek(stackHead,stackHead));
         pop(stackHead,stackHead);
         
@@ -234,7 +260,7 @@ enqueue(queueHead,queueHead ,temp);
         char* data = new char(array[i]);
         node* temp = new node(data);
   
-        
+        // Push token to the end of the stack
         push(stackHead,stackHead,temp);
         
       
@@ -248,7 +274,7 @@ enqueue(queueHead,queueHead ,temp);
     char* data = new char(array[i]);
     node* temp = new  node(data);
     
- 
+ // Push token to the end of the stack
     push(stackHead,stackHead, temp);
       
     
@@ -259,44 +285,29 @@ enqueue(queueHead,queueHead ,temp);
         
         
     }
-    
+
+    // If token is a left paren
 } else if(array[i] == '(' ) {
   
 char* data = new char(array[i]);
 
 node* temp = new node(data);
+    // Push to the end of the stack
 push(stackHead,stackHead ,temp);
   
  
     
 
 
-    
-  
- 
-    
-    
-   
- 
-
 
 } else if(array[i] == ')') {
     
-    
-  
-
-    
-    
-    
-    
-    
+// While the top of the stack is not a left paren
    
 while(*(peek(stackHead,stackHead) -> getValue()) != '(') {
     
- 
-    
-    
- 
+
+// Add the top of the stack to the output queue and remove it from the end of the stack
  enqueue(queueHead,queueHead,peek(stackHead,stackHead));
     
 pop(stackHead,stackHead);
@@ -307,15 +318,14 @@ pop(stackHead,stackHead);
     
    
     
-    
+    // If the top of the stack is a left paren
 if(*(peek(stackHead,stackHead)->getValue()) == '(') {
     
    
-
+// Remove it from the top of the stack
 pop(stackHead,stackHead);
 
     
- 
 
 }
 
@@ -323,17 +333,11 @@ pop(stackHead,stackHead);
 
 }
     
-
-    
-  
-    
-    
-
+// If there are no more tokens to read and there are still operators in the stack
 
         while(stackHead != NULL) {
             
-            
-           
+            // Add to output queue and remove from stack
             enqueue(queueHead,queueHead, peek(stackHead,stackHead));
             pop(stackHead,stackHead);
             
@@ -363,21 +367,26 @@ pop(stackHead,stackHead);
 
 
 
-
+// Function below builds binary tree
+// Pseudo code gotten from https://en.wikipedia.org/wiki/Binary_expression_tree
 void buildTree(node* &queueHead,node* &treeHead,node* currentQueue,node* currentTree) {
-    
+   
     while(currentQueue!= NULL) {
         cout << currentQueue ->getValue();
-        currentQueue = currentQueue->getNext();
+       currentQueue= currentQueue->getNext();
         
     }
     cout << endl;
+    // While queue is not empty
     while(queueHead!=NULL) {
-        cout << queueHead->getValue() << endl;
+        
         
         if(isdigit(*(queueHead->getValue()))) {
-          
+            
+          // If value is operand
             node* temp = new node(queueHead->getValue());
+            cout << temp->getValue() << endl;
+            // Push to the tree stack and remove from queue
             push(treeHead,treeHead,temp);
             
             dequeue(queueHead,queueHead);
@@ -386,12 +395,22 @@ void buildTree(node* &queueHead,node* &treeHead,node* currentQueue,node* current
             
             
         } else {
+            // If value is operator
+            // Set stackhead to the right pointer for the operator node
+            // Pop stackhead
+            // Set the new stackHead as the left pointer for the operator node
+            // Pop stackhead
+            // Push the operator to the tree stack
             node* temp = new node(queueHead->getValue());
+            temp = queueHead;
             temp->setRight(peek(treeHead,treeHead));
             pop(treeHead,treeHead);
             temp->setLeft(peek(treeHead,treeHead));
             pop(treeHead,treeHead);
             push(treeHead,treeHead,temp);
+            cout << temp->getValue() << "k" << endl;
+            cout << temp->getLeft()->getValue() << "k" << endl;
+            cout << temp->getRight()->getValue() << "k" << endl;
           
             dequeue(queueHead,queueHead);
         
@@ -403,11 +422,13 @@ void buildTree(node* &queueHead,node* &treeHead,node* currentQueue,node* current
         
         
     }
-    cout << endl;
+    
+  
     
 }
 
-
+// Following function transverses the binary tree outputting it in infix
+// Pseudo code gotten from https://en.wikipedia.org/wiki/Binary_expression_tree
 void infix(node * treeHead) {
     if(treeHead != NULL) {
     if(*(treeHead->getValue()) == '+' || *(treeHead->getValue()) == '-' || *(treeHead->getValue()) == '*' || *(treeHead->getValue()) == '/') {
@@ -430,6 +451,9 @@ void infix(node * treeHead) {
 }
 
 
+// Following function transverses the binary tree outputting it in prefix
+// Pseudo code gotten from https://en.wikipedia.org/wiki/Binary_expression_tree
+
 void prefix(node* treeHead) {
     if(treeHead != NULL) {
     cout << treeHead->getValue();
@@ -445,6 +469,9 @@ void prefix(node* treeHead) {
     
 }
 
+
+// Following function transverses the binary tree outputting it in pstfix
+// Pseudo code gotten from https://en.wikipedia.org/wiki/Binary_expression_tree
 
 void postfix(node* treeHead) {
  
